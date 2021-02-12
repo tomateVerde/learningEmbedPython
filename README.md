@@ -2,6 +2,22 @@
 
 Recently learned a little bit about Python's C API. Decided to make an example code for me to reference in the future.
 
+Here is the example:
+
+```python
+def print_args(a, b , c, d):
+
+  print("Hello World from python")
+  print("--- Received {}".format(a))
+  print("--- Received {}".format(b))
+  print("--- Received {}".format(c))
+  print("--- Received {}".format(d))
+
+def no_args():
+
+  return bytearray(b'This is a function with no args')
+```
+
 ```c++
 int main(int argc, char** argv)
 {
@@ -36,4 +52,13 @@ int main(int argc, char** argv)
 
   return 0;
 }
+```
+Output: 
+```
+Hello World from python
+--- Received bytearray(b'Hello world!!')
+--- Received bytearray(b'This is a string')
+--- Received 246
+--- Received 3.1415
+From Python: This is a function with no args
 ```
