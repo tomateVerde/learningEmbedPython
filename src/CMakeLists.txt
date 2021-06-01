@@ -7,7 +7,3 @@ project(Tutorial)
 
 # add the executable
 add_executable(Tutorial main.cpp)
-
-target_include_directories(Tutorial PUBLIC
-                           "${PROJECT_BINARY_DIR}"
-                           )
