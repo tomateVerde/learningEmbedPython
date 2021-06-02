@@ -40,19 +40,23 @@ Setup: Setup-RelWithDebInfo Setup-MinSizeRel Setup-Debug Setup-Release
 ######################################################################
 .PHONY: RelWithDebInfo
 RelWithDebInfo:
-		cmake --build $(BUILD_DIR)/RelWithDebInfo
+		cmake --build $(BUILD_DIR)/RelWithDebInfo && \
+		cmake --install $(BUILD_DIR)/RelWithDebInfo
 
 .PHONY: MinSizeRel
 MinSizeRel:
-		cmake --build $(BUILD_DIR)/MinSizeRel
+		cmake --build $(BUILD_DIR)/MinSizeRel && \
+		cmake --install $(BUILD_DIR)/MinSizeRel
 
 .PHONY: Debug
 Debug:
-		cmake --build $(BUILD_DIR)/Debug
+		cmake --build $(BUILD_DIR)/Debug && \
+		cmake --install $(BUILD_DIR)/Debug
 
 .PHONY: Release
 Release:
-		cmake --build $(BUILD_DIR)/Release
+		cmake --build $(BUILD_DIR)/Release && \
+		cmake --install $(BUILD_DIR)/Release
 
 .PHONY: All
 All: RelWithDebInfo MinSizeRel Debug Release
