@@ -2,65 +2,65 @@ SRC_DIR=$(CURDIR)/src
 BUILD_DIR=$(CURDIR)/build
 
 ######################################################################
-.PHONY: Setup-RelWithDebInfo
-Setup-RelWithDebInfo:
-		mkdir -p $(BUILD_DIR)/RelWithDebInfo && \
-		cmake -B $(BUILD_DIR)/RelWithDebInfo \
+.PHONY: setup-relwithdebinfo
+setup-relwithdebinfo:
+		mkdir -p $(BUILD_DIR)/relwithdebinfo && \
+		cmake -B $(BUILD_DIR)/relwithdebinfo \
 		-S $(SRC_DIR) \
 		-G"MinGW Makefiles" \
 		-DCMAKE_BUILD_TYPE=RelWithDebInfo
 
-.PHONY: Setup-MinSizeRel
-Setup-MinSizeRel:
-		mkdir -p $(BUILD_DIR)/MinSizeRel && \
-		cmake -B $(BUILD_DIR)/MinSizeRel \
+.PHONY: setup-minsizerel
+setup-minsizerel:
+		mkdir -p $(BUILD_DIR)/minsizerel && \
+		cmake -B $(BUILD_DIR)/minsizerel \
 		-S $(SRC_DIR) \
 		-G"MinGW Makefiles" \
 		-DCMAKE_BUILD_TYPE=MinSizeRel
 
-.PHONY: Setup-Debug
-Setup-Debug:
-		mkdir -p $(BUILD_DIR)/Debug && \
-		cmake -B $(BUILD_DIR)/Debug \
+.PHONY: setup-debug
+setup-debug:
+		mkdir -p $(BUILD_DIR)/debug && \
+		cmake -B $(BUILD_DIR)/debug \
 		-S $(SRC_DIR) \
 		-G"MinGW Makefiles" \
 		-DCMAKE_BUILD_TYPE=Debug
 
-.PHONY: Setup-Release
-Setup-Release:
-		mkdir -p $(BUILD_DIR)/Release && \
-		cmake -B $(BUILD_DIR)/Release \
+.PHONY: setup-release
+setup-release:
+		mkdir -p $(BUILD_DIR)/release && \
+		cmake -B $(BUILD_DIR)/release \
 		-S $(SRC_DIR) \
 		-G"MinGW Makefiles" \
 		-DCMAKE_BUILD_TYPE=Release
 
-.PHONY: Setup
-Setup: Setup-RelWithDebInfo Setup-MinSizeRel Setup-Debug Setup-Release
+.PHONY: setup
+setup: setup-relwithdebinfo setup-MinSizeRel setup-Debug setup-Release
 
 ######################################################################
-.PHONY: RelWithDebInfo
-RelWithDebInfo:
-		cmake --build $(BUILD_DIR)/RelWithDebInfo && \
-		cmake --install $(BUILD_DIR)/RelWithDebInfo
+.PHONY: relwithdebinfo
+relwithdebinfo:
+		cmake --build $(BUILD_DIR)/relwithdebinfo && \
+		cmake --install $(BUILD_DIR)/relwithdebinfo
 
-.PHONY: MinSizeRel
-MinSizeRel:
-		cmake --build $(BUILD_DIR)/MinSizeRel && \
-		cmake --install $(BUILD_DIR)/MinSizeRel
+.PHONY: minsizerel
+minsizerel:
+		cmake --build $(BUILD_DIR)/minsizerel && \
+		cmake --install $(BUILD_DIR)/minsizerel
 
-.PHONY: Debug
-Debug:
-		cmake --build $(BUILD_DIR)/Debug && \
-		cmake --install $(BUILD_DIR)/Debug
+.PHONY: debug
+debug:
+		cmake --build $(BUILD_DIR)/debug && \
+		cmake --install $(BUILD_DIR)/debug
 
-.PHONY: Release
-Release:
-		cmake --build $(BUILD_DIR)/Release && \
-		cmake --install $(BUILD_DIR)/Release
+.PHONY: release
+release:
+		cmake --build $(BUILD_DIR)/release && \
+		cmake --install $(BUILD_DIR)/release
 
 .PHONY: All
-All: RelWithDebInfo MinSizeRel Debug Release
+All: relwithdebinfo minsizerel debug delease
 
-.PHONY: Clean
-Clean:
+.PHONY: clean
+clean:
 		rm -rf build
