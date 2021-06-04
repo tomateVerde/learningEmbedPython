@@ -77,3 +77,6 @@ From Python: This is a function with no args
     + Make sure MinGW and the Python lib are the same 32 bits or 64 bits version
 + Running into `windows error while loading shared libraries: ?: cannot open shared object file: No such file or directory`
     + Make sure MinGW is part of your path
+
+## Resources
++ [Python 3.9.5 documentation](https://docs.python.org/3/contents.html)

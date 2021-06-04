@@ -50,11 +50,33 @@ public:
       if (pFunc && PyCallable_Check(pFunc)) 
       {
         
-        PyObject* pArgs = createPyArgs(std::forward<Args>(args)...);
+        PyObject* pArgs = pie::createPyArgs(std::forward<Args>(args)...);
 
         PyObject* pValue = PyObject_CallObject(pFunc, pArgs);
 
         Py_XDECREF(pArgs);
+        Py_XDECREF(pFunc);
+
+        if (pValue)
+        {
+          return pValue;
+        }
+      }
+    }
+
+    return NULL;
+  }
+
+  PyObject* callFunction(const char* const functionName)
+  {
+    for (auto pModule :  py_modules)
+    {
+      PyObject* pFunc = PyObject_GetAttrString(pModule, functionName);
+
+      if (pFunc && PyCallable_Check(pFunc)) 
+      {
+        PyObject* pValue = PyObject_CallObject(pFunc, nullptr);
+
         Py_XDECREF(pFunc);
 
         if (pValue)
@@ -116,12 +138,14 @@ int main(int argc, char** argv)
   foo.importModule("example");
 
   const std::string aString("This is a string");
-  const uint32_t aInt = 246;
+  const size_t aInt = 246;
+  // const int32_t aInt = 246;
   const double aFloat = 3.1415;
 
   // Calling a function without some args
   PyObject* pValue = 
-    foo.callFunction("print_args", "Hello world!!", aString, aInt, aFloat);
+    foo.callFunction("print_args", "Hello world!!");
+    // foo.callFunction("print_args", "Hello world!!", aString, aInt, aFloat);
   
   if (pValue)
   {
@@ -129,7 +153,7 @@ int main(int argc, char** argv)
   }
 
   // Calling a function without args but returns a byte array
-  pValue = foo.callFunction("no_args", NULL);
+  pValue = foo.callFunction("no_args");
 
   if (pValue && PyByteArray_Check(pValue) > 0)
   {

@@ -2,74 +2,84 @@
 #include <string>
 #include <type_traits>
 
+#include <iostream>
+
+namespace pie
+{
+
 namespace
 {
 //////////////////////////////////////////////////////
-inline PyObject* const _addArg(std::string str)
+/// @brief Create PyObjects* from C++ types
+inline PyObject* const _add_arg(const std::string& str)
 {
   return PyByteArray_FromStringAndSize(str.c_str(), str.size());
 }
 
-/////////////////////////////////////////////////////
-inline PyObject* const _addArg(PyObject* pyObj)
+inline PyObject* const _add_arg(PyObject* const pyObj)
 {
   return pyObj;
 }
 
-//////////////////////////////////////////////////////
 template<typename T,
-        std::enable_if_t<std::is_integral<T>::value, bool> = true>
-PyObject* const _addArg(const T value)
+        std::enable_if_t<std::is_integral<T>::value &&
+                         std::is_signed<T>::value, bool> = true>
+PyObject* const _add_arg(const T value)
 {
-  return PyLong_FromLong(value);
+  return PyLong_FromLongLong(value);
 }
 
-//////////////////////////////////////////////////////
+template<typename T,
+        std::enable_if_t<std::is_integral<T>::value &&
+                         !std::is_signed<T>::value, bool> = true>
+PyObject* const _add_arg(const T value)
+{
+  return PyLong_FromUnsignedLongLong(value);
+}
+
 template<typename T, 
         std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
-PyObject* const _addArg(const T value)
+PyObject* const _add_arg(const T value)
 {
   return PyFloat_FromDouble(value);
 }
 
 //////////////////////////////////////////////////////
+/// @brief Recursive calls to set PyTuple
 template<class Arg>
-PyObject* _createPyArgs(PyObject* pArgs, const uint32_t argIndex, Arg arg)
+PyObject* _create_PyArgs(PyObject* pArgs, const uint32_t index, Arg arg)
 {
-  PyObject* pValue = _addArg(arg);
-  
-  PyTuple_SetItem(pArgs, argIndex, pValue);
+  PyTuple_SetItem(pArgs, index, _add_arg(arg));
 
   return pArgs;
 }
 
-//////////////////////////////////////////////////////
 template<class Arg, class... Args>
-PyObject* _createPyArgs(PyObject* pArgs, const uint32_t argIndex, Arg arg, Args... otherArgs)
+PyObject* _create_PyArgs(PyObject* pArgs, const uint32_t index, Arg arg, Args... otherArgs)
 {
-  PyObject* pValue = _addArg(arg);
-  
-  PyTuple_SetItem(pArgs, argIndex, pValue);
+  PyTuple_SetItem(pArgs, index, _add_arg(arg));
 
-  _createPyArgs(pArgs, argIndex + 1, otherArgs...);
+  _create_PyArgs(pArgs, index + 1, otherArgs...);
 
   return pArgs;
 }
 
 } // anonymous namespace
 
+
+//////////////////////////////////////////////////////
+
 //////////////////////////////////////////////////////
 template<class Arg, class... Args>
 PyObject* createPyArgs(Arg arg, Args... otherArgs)
 {
-  if (sizeof...(otherArgs) > 0)
-  {
-    PyObject* pArgs = PyTuple_New(sizeof...(otherArgs) + 1);
+  PyObject* pArgs = PyTuple_New(sizeof...(otherArgs) + 1);
 
-    _createPyArgs(pArgs, 0, arg, otherArgs...);
+  _create_PyArgs(pArgs, 0, arg, otherArgs...);
 
-    return pArgs;
-  }
-
-  return nullptr;
+  return pArgs;
 }
+
+
+
+} // namespace pie
