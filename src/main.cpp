@@ -140,12 +140,16 @@ int main(int argc, char** argv)
   const std::string aString("This is a string");
   const size_t aInt = 246;
   // const int32_t aInt = 246;
-  const double aFloat = 3.1415;
+  // const double aFloat = 3.1415;
+
+  std::array<float, 7> arr = {3.14, 3.45, 4.65, 3, 4,5 ,6};
 
   // Calling a function without some args
   PyObject* pValue = 
-    foo.callFunction("print_args", "Hello world!!");
+    // foo.callFunction("print_args", false);
+    // foo.callFunction("print_args", "Hello world!!");
     // foo.callFunction("print_args", "Hello world!!", aString, aInt, aFloat);
+    foo.callFunction("print_args", "Hello world!!", aString, aInt, arr);
   
   if (pValue)
   {
