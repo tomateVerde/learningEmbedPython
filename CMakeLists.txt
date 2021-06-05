@@ -7,13 +7,20 @@ project(myPie)
 
 find_package (Python REQUIRED COMPONENTS Development)
 
+
 # add the executable
 add_executable(myPie main.cpp)
 
-target_link_libraries(myPie ${Python_LIBRARIES})
+target_link_libraries(myPie PUBLIC
+  pie
+  ${Python_LIBRARIES}
+)
 
-target_include_directories(myPie PUBLIC ${Python_INCLUDE_DIRS})
-
-message(STATUS "Output is ${CMAKE_BINARY_DIR}")
+target_include_directories(myPie
+PUBLIC
+  ${Python_INCLUDE_DIRS}
+)
 
 install(FILES ./example.py DESTINATION ${CMAKE_BINARY_DIR})
+
+add_subdirectory(pie)
