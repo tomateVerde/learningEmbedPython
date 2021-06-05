@@ -4,7 +4,7 @@
 #include <utility>
 #include <vector>
 
-#include "helper.hpp"
+#include "include/helper.hpp"
 
 /////
 #include <iostream>
@@ -50,11 +50,11 @@ public:
       if (pFunc && PyCallable_Check(pFunc)) 
       {
         
-        PyObject* pArgs = pie::createPyArgs(std::forward<Args>(args)...);
+        PyObject* pArgs = pie::create_PyArgs(std::forward<Args>(args)...);
 
         PyObject* pValue = PyObject_CallObject(pFunc, pArgs);
 
-        Py_XDECREF(pArgs);
+        Py_DECREF(pArgs);
         Py_XDECREF(pFunc);
 
         if (pValue)
