@@ -1,9 +1,11 @@
+/// Standard
 #include <array>
-#include <Python.h>
-#include <string>
 #include <string_view>
 #include <type_traits>
 #include <vector>
+
+/// Libraries
+#include <Python.h>
 
 namespace pie
 {
@@ -50,9 +52,9 @@ namespace
     return PyBytes_FromString(value);
   }
 
-  inline PyObject* const _add_arg(const std::string& str)
+  inline PyObject* const _add_arg(const std::string_view& str)
   {
-    return PyByteArray_FromStringAndSize(str.c_str(), str.size());
+    return PyByteArray_FromStringAndSize(str.data(), str.size());
   }
 
   PyObject* const _add_arg(const void* ptr, const uint32_t size)
@@ -75,17 +77,17 @@ namespace
   //////////////////////////////////////////////////////
   /// @brief Recursive calls to set PyTuple
   template<class T>
-  PyObject* _create_PyArgs(PyObject* pArgs, const uint32_t index, T arg)
+  PyObject* _create_PyArgs(PyObject* pArgs, const uint32_t index, T item)
   {
-    PyTuple_SET_ITEM(pArgs, index, _add_arg(arg));
+    PyTuple_SET_ITEM(pArgs, index, _add_arg(item));
 
     return pArgs;
   }
 
   template<class T, class... Args>
-  PyObject* _create_PyArgs(PyObject* pArgs, const uint32_t index, T arg, Args... args)
+  PyObject* _create_PyArgs(PyObject* pArgs, const uint32_t index, T item, Args... args)
   {
-    PyTuple_SET_ITEM(pArgs, index, _add_arg(arg));
+    PyTuple_SET_ITEM(pArgs, index, _add_arg(item));
 
     return _create_PyArgs(pArgs, index + 1, args...);
   }
@@ -94,9 +96,9 @@ namespace
 
 //////////////////////////////////////////////////////
 template<class T, class... Args>
-PyObject* createPyArgs(T arg, Args... args)
+PyObject* create_PyArgs(T item, Args... args)
 {
-  return _create_PyArgs(PyTuple_New(sizeof...(args) + 1), 0, arg, args...);;
+  return _create_PyArgs(PyTuple_New(sizeof...(args) + 1), 0, item, args...);;
 }
 
 } // namespace pie
