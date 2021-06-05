@@ -8,7 +8,8 @@ setup-relwithdebinfo:
 		cmake -B $(BUILD_DIR)/relwithdebinfo \
 		-S $(SRC_DIR) \
 		-G"MinGW Makefiles" \
-		-DCMAKE_BUILD_TYPE=RelWithDebInfo
+		-DCMAKE_BUILD_TYPE=RelWithDebInfo && \
+		cmake --install $(BUILD_DIR)/relwithdebinfo
 
 .PHONY: setup-minsizerel
 setup-minsizerel:
@@ -16,7 +17,8 @@ setup-minsizerel:
 		cmake -B $(BUILD_DIR)/minsizerel \
 		-S $(SRC_DIR) \
 		-G"MinGW Makefiles" \
-		-DCMAKE_BUILD_TYPE=MinSizeRel
+		-DCMAKE_BUILD_TYPE=MinSizeRel && \
+		cmake --install $(BUILD_DIR)/minsizerel
 
 .PHONY: setup-debug
 setup-debug:
@@ -24,7 +26,8 @@ setup-debug:
 		cmake -B $(BUILD_DIR)/debug \
 		-S $(SRC_DIR) \
 		-G"MinGW Makefiles" \
-		-DCMAKE_BUILD_TYPE=Debug
+		-DCMAKE_BUILD_TYPE=Debug && \
+		cmake --install $(BUILD_DIR)/debug
 
 .PHONY: setup-release
 setup-release:
@@ -32,7 +35,8 @@ setup-release:
 		cmake -B $(BUILD_DIR)/release \
 		-S $(SRC_DIR) \
 		-G"MinGW Makefiles" \
-		-DCMAKE_BUILD_TYPE=Release
+		-DCMAKE_BUILD_TYPE=Release && \
+		cmake --install $(BUILD_DIR)/release
 
 .PHONY: setup
 setup: setup-relwithdebinfo setup-MinSizeRel setup-Debug setup-Release
@@ -40,23 +44,19 @@ setup: setup-relwithdebinfo setup-MinSizeRel setup-Debug setup-Release
 ######################################################################
 .PHONY: relwithdebinfo
 relwithdebinfo:
-		cmake --build $(BUILD_DIR)/relwithdebinfo && \
-		cmake --install $(BUILD_DIR)/relwithdebinfo
+		cmake --build $(BUILD_DIR)/relwithdebinfo
 
 .PHONY: minsizerel
 minsizerel:
-		cmake --build $(BUILD_DIR)/minsizerel && \
-		cmake --install $(BUILD_DIR)/minsizerel
+		cmake --build $(BUILD_DIR)/minsizerel
 
 .PHONY: debug
 debug:
-		cmake --build $(BUILD_DIR)/debug && \
-		cmake --install $(BUILD_DIR)/debug
+		cmake --build $(BUILD_DIR)/debug
 
 .PHONY: release
 release:
-		cmake --build $(BUILD_DIR)/release && \
-		cmake --install $(BUILD_DIR)/release
+		cmake --build $(BUILD_DIR)/release
 
 .PHONY: All
 All: relwithdebinfo minsizerel debug delease
