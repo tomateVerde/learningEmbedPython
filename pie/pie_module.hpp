@@ -34,6 +34,8 @@ public:
   ////////////////////////////////////////////////////////////////////////////
   Module& operator= (const Module& other)
   {
+    Py_XDECREF(this->module_);
+
     this->module_name_ = other.module_name_;
     this->module_ = other.module_;
 
