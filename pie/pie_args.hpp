@@ -1,3 +1,6 @@
+#ifndef PIE_ARGS_HPP
+#define PIE_ARGS_HPP
+
 /// Standard
 #include <array>
 #include <string_view>
@@ -102,3 +105,5 @@ PyObject* create_PyArgs(T item, Args... args)
 }
 
 } // namespace pie
+
+#endif // PIE_ARGS_HPP
