@@ -3,6 +3,7 @@
 #define PIE_MODULE_HPP
 
 /// Standard
+#include <stdexcept>
 #include <string>
 
 /// Libraries
@@ -23,6 +24,11 @@ public:
     module_(PyImport_ImportModule(module_name)),
     module_name_(module_name)
   {
+    if (!module_)
+    {
+      throw std::invalid_argument((std::string{"Invalid module: "} + module_name_).c_str());
+    }
+    
     Py_XINCREF(module_);
   }
 
@@ -32,7 +38,7 @@ public:
   }
 
   ////////////////////////////////////////////////////////////////////////////
-  Module& operator= (const Module& other)
+  Module& operator= (const Module& other) /// Remove this, do unique ptrs
   {
     Py_XDECREF(this->module_);
 
@@ -101,6 +107,23 @@ public:
 
     return py_return;
   }
+
+  ////////////////////////////////////////////////////////////////////////////
+  /// @brief Reloads module
+  /// @return true on success
+  /// TODO Possible issue
+  // bool reload()
+  // {
+  //   auto new_module = PyImport_ReloadModule(module_);
+
+  //   if (new_module)
+  //   {
+  //     module_ = new_module;
+  //     return true
+  //   }
+    
+  //   return false;
+  // }
 
 private:
 

@@ -1,88 +1,17 @@
-#include <filesystem>
-#include <Python.h>
 #include <string>
-#include <utility>
-#include <vector>
 
-
-#include "pie/pie_args.hpp"
-#include "pie/pie_module.hpp"
+#include "pie/pie_interpreter.hpp"
 
 /////
 #include <iostream>
 /////
 
-class PyModule
-{
-public:
-  
-  ///////////////////////////////////////////////
-  static class PyModule& getInstance()
-  {
-    static PyModule instance;
-
-    return instance;
-  }
-
-  ///////////////////////////////////////////////
-  PyModule ( const PyModule & )     = delete;
-  PyModule ( PyModule && )          = delete;
-  void operator=(PyModule const&)   = delete;
-  void operator=(PyModule const&&)  = delete;
-
-  ///////////////////////////////////////////////
-  ~PyModule()
-  {
-    Py_FinalizeEx();
-  }
-
-  ///////////////////////////////////////////////
-  template<class... Args>
-  PyObject* callFunction(const char* const functionName, Args... args)
-  {
-    for (const auto& pie_mod : pie_modules)
-    {
-      return pie_mod.function(functionName, std::forward<Args>(args)...);
-    }
-
-    return NULL;
-  }
-
-  PyObject* callFunction(const char* const functionName)
-  {
-    for (const auto& pie_mod : pie_modules)
-    {
-      return pie_mod.function(functionName);
-    }
-
-    return NULL;
-  }
-
-  ///////////////////////////////////////////////
-  bool importModule(const char * const py_module)
-  {
-    pie_modules.emplace_back(py_module);
-
-    return true;
-  }
-
-private:
-
-  ///////////////////////////////////////////////
-  PyModule()
-  {
-    Py_Initialize();
-  }
-
-  std::vector<pie::Module> pie_modules;
-};
-
 int main(int argc, char** argv)
 {
   // Singleton to avoid calling `Py_FinalizeEx` twice
-  PyModule& foo(PyModule::getInstance());
+  pie::Interpreter& foo(pie::Interpreter::instance());
 
-  foo.importModule("example");
+  foo.import_module("example");
 
   const std::string aString("This is a string");
   const size_t aInt = 246;
@@ -93,10 +22,10 @@ int main(int argc, char** argv)
 
   // Calling a function without some args
   PyObject* pValue = 
-    // foo.callFunction("print_args", false);
-    // foo.callFunction("print_args", "Hello world!!");
-    // foo.callFunction("print_args", "Hello world!!", aString, aInt, aFloat);
-    foo.callFunction("print_args", "Hello world!!", aString, aInt, arr);
+    // foo.call_function("print_args", false);
+    // foo.call_function("print_args", "Hello world!!");
+    // foo.call_function("print_args", "Hello world!!", aString, aInt, aFloat);
+    foo.call_function({"example", "print_args"}, "Hello world!!", aString, aInt, arr);
   
   if (pValue)
   {
@@ -104,7 +33,7 @@ int main(int argc, char** argv)
   }
 
   // Calling a function without args but returns a byte array
-  pValue = foo.callFunction("no_args");
+  pValue = foo.call_function({"example", "no_args"});
 
   if (pValue && PyByteArray_Check(pValue) > 0)
   {
@@ -117,12 +46,9 @@ int main(int argc, char** argv)
     Py_XDECREF(pValue);
   }
 
-  foo.importModule("base64");
+  foo.import_module("base64");
 
-  pValue = foo.callFunction("b64encode", "foo");
-
-  if (pValue)
-    std::cout << "Good pValue" << std::endl;
+  pValue = foo.call_function({"base64", "b64encode"}, "foobar");
 
   if (pValue && PyBytes_Check(pValue) > 0)
   {
