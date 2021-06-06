@@ -5,7 +5,8 @@
 #include <vector>
 
 
-#include "pie/py_args.hpp"
+#include "pie/pie_args.hpp"
+#include "pie/pie_module.hpp"
 
 /////
 #include <iostream>
@@ -32,11 +33,6 @@ public:
   ///////////////////////////////////////////////
   ~PyModule()
   {
-    for (auto pModule :  py_modules)
-    {
-      Py_XDECREF(pModule);
-    }
-
     Py_FinalizeEx();
   }
 
@@ -44,25 +40,9 @@ public:
   template<class... Args>
   PyObject* callFunction(const char* const functionName, Args... args)
   {
-    for (auto pModule :  py_modules)
+    for (const auto& pie_mod : pie_modules)
     {
-      PyObject* pFunc = PyObject_GetAttrString(pModule, functionName);
-
-      if (pFunc && PyCallable_Check(pFunc)) 
-      {
-        
-        PyObject* pArgs = pie::create_PyArgs(std::forward<Args>(args)...);
-
-        PyObject* pValue = PyObject_CallObject(pFunc, pArgs);
-
-        Py_DECREF(pArgs);
-        Py_XDECREF(pFunc);
-
-        if (pValue)
-        {
-          return pValue;
-        }
-      }
+      return pie_mod.function(functionName, std::forward<Args>(args)...);
     }
 
     return NULL;
@@ -70,21 +50,9 @@ public:
 
   PyObject* callFunction(const char* const functionName)
   {
-    for (auto pModule :  py_modules)
+    for (const auto& pie_mod : pie_modules)
     {
-      PyObject* pFunc = PyObject_GetAttrString(pModule, functionName);
-
-      if (pFunc && PyCallable_Check(pFunc)) 
-      {
-        PyObject* pValue = PyObject_CallObject(pFunc, nullptr);
-
-        Py_XDECREF(pFunc);
-
-        if (pValue)
-        {
-          return pValue;
-        }
-      }
+      return pie_mod.function(functionName);
     }
 
     return NULL;
@@ -93,27 +61,7 @@ public:
   ///////////////////////////////////////////////
   bool importModule(const char * const py_module)
   {
-    const std::filesystem::path module_path(py_module);
-
-    // Need to add the module to the system path
-    const std::string sysPathAppend = 
-      std::string("sys.path.append(\"") + 
-      module_path.parent_path().string() +
-      std::string("\")");
-    
-    PyRun_SimpleString(sysPathAppend.c_str());
-
-    const std::string moduleName = module_path.filename().string();
-
-    PyObject* pModule = PyImport_ImportModule(moduleName.c_str());
-
-    if (!pModule) 
-    {
-      Py_XDECREF(pModule);
-      return false;
-    }
-
-    py_modules.push_back(pModule);
+    pie_modules.emplace_back(py_module);
 
     return true;
   }
@@ -124,11 +72,9 @@ private:
   PyModule()
   {
     Py_Initialize();
-
-    PyRun_SimpleString("import sys");
   }
 
-  std::vector<PyObject *> py_modules;
+  std::vector<pie::Module> pie_modules;
 };
 
 int main(int argc, char** argv)
@@ -163,6 +109,24 @@ int main(int argc, char** argv)
   if (pValue && PyByteArray_Check(pValue) > 0)
   {
     std::string output(PyByteArray_AsString(pValue));
+    std::cout << "From Python: " << output << std::endl;
+  }
+
+  if (pValue)
+  {
+    Py_XDECREF(pValue);
+  }
+
+  foo.importModule("base64");
+
+  pValue = foo.callFunction("b64encode", "foo");
+
+  if (pValue)
+    std::cout << "Good pValue" << std::endl;
+
+  if (pValue && PyBytes_Check(pValue) > 0)
+  {
+    std::string output(PyBytes_AsString(pValue));
     std::cout << "From Python: " << output << std::endl;
   }
 
