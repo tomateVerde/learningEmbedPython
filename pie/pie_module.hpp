@@ -32,30 +32,10 @@ public:
     Py_XINCREF(module_);
   }
 
+  ////////////////////////////////////////////////////////////////////////////
   ~Module()
   {
     Py_XDECREF(module_);
-  }
-
-  ////////////////////////////////////////////////////////////////////////////
-  Module& operator= (const Module& other) /// Remove this, do unique ptrs
-  {
-    Py_XDECREF(this->module_);
-
-    this->module_name_ = other.module_name_;
-    this->module_ = other.module_;
-
-    Py_XINCREF(this->module_);
-
-    return *this;
-  }
-
-  Module (const Module& other)
-  {
-    this->module_name_ = other.module_name_;
-    this->module_ = other.module_;
-
-    Py_XINCREF(this->module_);
   }
 
   ////////////////////////////////////////////////////////////////////////////
@@ -111,7 +91,7 @@ public:
   ////////////////////////////////////////////////////////////////////////////
   /// @brief Reloads module
   /// @return true on success
-  /// TODO Possible issue
+  /// TODO Possible issue, test with modules that have global variables
   // bool reload()
   // {
   //   auto new_module = PyImport_ReloadModule(module_);
@@ -128,7 +108,7 @@ public:
 private:
 
   PyObject * module_;
-  std::string module_name_;
+  const std::string module_name_;
 
 };
 
