@@ -1,6 +1,7 @@
 #include <string>
 
 #include "pie/pie_interpreter.hpp"
+#include "pie/pie_accessors.hpp"
 
 /////
 #include <iostream>
@@ -37,26 +38,28 @@ int main(int argc, char** argv)
 
   // Calling a function without args but returns a byte array
   pValue = example_mod->function("no_args");
+  const auto py_return = pie::get<std::string>(pValue);
 
-  if (pValue && PyByteArray_Check(pValue) > 0)
+  if (py_return)
   {
-    std::string output(PyByteArray_AsString(pValue));
-    std::cout << "From Python: " << output << std::endl;
+    std::cout << "From Python: " << py_return->c_str() << std::endl;
   }
 
-  if (pValue)
-  {
-    Py_XDECREF(pValue);
-  }
+  Py_XDECREF(pValue);
 
   pValue = interpreter.module("base64")->function("b64encode", "foobar");
   // pValue = interpreter.module("base64")->function("b64encode")("foobar");
   // pValue = interpreter.module("base64")->function("b64encode")(); // @TODO? Maybe looks kinda kool TM
 
-  if (pValue && PyBytes_Check(pValue) > 0)
+  // @TODO Add gtest, its time to add testing
+  // @TODO After testing add CI
+  // @TODO Don't forget to change the name of the project
+
+  const auto encoded = pie::get<std::string>(pValue);
+
+  if (encoded)
   {
-    std::string output(PyBytes_AsString(pValue));
-    std::cout << "From Python: " << output << std::endl;
+    std::cout << "Encoded value from Python: " << encoded->c_str() << std::endl;
   }
 
   Py_XDECREF(pValue);
