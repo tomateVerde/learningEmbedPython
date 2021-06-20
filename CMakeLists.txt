@@ -5,7 +5,7 @@ set (CMAKE_CXX_STANDARD 17)
 # set the project name
 project(myPie)
 
-find_package (Python REQUIRED COMPONENTS Development)
+find_package (Python 3.9 REQUIRED COMPONENTS Development)
 
 
 # add the executable
